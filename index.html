@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#080810">
+<title>Rainbow Digital Clock</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%23080810'/%3E%3Crect x='5' y='5' width='90' height='90' rx='20' fill='none' stroke='%23ff35c8' stroke-width='4'/%3E%3Ctext x='50' y='56' font-size='25' font-family='monospace' font-weight='bold' text-anchor='middle' fill='%23ffffff'%3E12:34%3C/text%3E%3C/svg%3E">
+<style>
+  body {
+    margin: 0;
+    min-height: 100vh;
+    min-height: 100dvh;
+    padding: 24px 12px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background: #080810;
+    font-family: monospace;
+    color: white;
+    text-align: center;
+  }
+  h1 {
+    background: linear-gradient(90deg, red, orange, yellow, lime, cyan, blue, violet, red);
+    background-size: 300%;
+    color: transparent;
+    -webkit-background-clip: text;
+    background-clip: text;
+    animation: rainbow 5s linear infinite;
+    font-size: clamp(1.4rem, 5vw, 3rem);
+  }
+  #clock {
+    font-size: clamp(40px, 12vw, 130px);
+    font-weight: bold;
+    background: linear-gradient(90deg, red, orange, yellow, lime, cyan, blue, violet);
+    background-size: 300% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    filter: drop-shadow(0 0 12px #8a2be2);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+    transition: filter .2s ease;
+  }
+  #date {
+    margin: 18px 0 8px;
+    color: #f0eaff;
+    font-family: system-ui, sans-serif;
+    font-size: clamp(1rem, 3vw, 1.5rem);
+    font-weight: 600;
+  }
+  #zone {
+    margin: 0 0 22px;
+    color: #9c9ab7;
+    font-family: system-ui, sans-serif;
+    font-size: .9rem;
+  }
+  .controls {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+  }
+  button {
+    border: 1px solid #55516f;
+    border-radius: 999px;
+    padding: 12px 18px;
+    background: #171526;
+    color: white;
+    font: bold 14px system-ui, sans-serif;
+    cursor: pointer;
+  }
+  button:hover { background: #292541; }
+  button:focus-visible { outline: 3px solid cyan; outline-offset: 3px; }
+  body:not(.rainbow) h1 {
+    background: none;
+    color: #fff;
+    animation: none;
+  }
+  body:not(.rainbow) #clock {
+    background: linear-gradient(90deg, #fff, #7cecff);
+    -webkit-background-clip: text;
+    background-clip: text;
+    filter: drop-shadow(0 0 12px #168cff);
+  }
+  @keyframes rainbow {
+    to { background-position: 300% center; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    h1 { animation: none; }
+    *, *::before, *::after { transition: none !important; }
+  }
+</style>
+</head>
+<body class="rainbow">
+<h1>🌈 MICHIGAN CLOCK</h1>
+<div id="clock" aria-label="Current Michigan time">00:00:00 AM</div>
+<div id="date">Loading date…</div>
+<div id="zone">Michigan, USA · Eastern Time</div>
+<div class="controls">
+  <button id="rainbowButton" type="button" aria-pressed="true">🌈 Rainbow Mode: On</button>
+  <button id="fullscreenButton" type="button">⛶ Fullscreen</button>
+</div>
+<script>
+const clock = document.getElementById("clock");
+const date = document.getElementById("date");
+const rainbowButton = document.getElementById("rainbowButton");
+const fullscreenButton = document.getElementById("fullscreenButton");
+const timeFormatter = new Intl.DateTimeFormat("en-US", {
+  timeZone: "America/Detroit",
+  hour: "2-digit",
+  minute: "2-digit",
+  second: "2-digit",
+  hour12: true
+});
+const dateFormatter = new Intl.DateTimeFormat("en-US", {
+  timeZone: "America/Detroit",
+  weekday: "long",
+  month: "long",
+  day: "numeric",
+  year: "numeric"
+});
+
+function updateClock() {
+  const now = new Date();
+  clock.textContent = timeFormatter.format(now);
+  date.textContent = dateFormatter.format(now);
+}
+rainbowButton.addEventListener("click", () => {
+  const enabled = document.body.classList.toggle("rainbow");
+  rainbowButton.textContent = enabled ? "🌈 Rainbow Mode: On" : "✨ Rainbow Mode: Off";
+  rainbowButton.setAttribute("aria-pressed", String(enabled));
+});
+fullscreenButton.addEventListener("click", async () => {
+  try {
+    if (!document.fullscreenElement) {
+      await document.documentElement.requestFullscreen();
+    } else {
+      await document.exitFullscreen();
+    }
+  } catch (error) {
+    alert("Fullscreen could not start. Try Chrome's fullscreen option.");
+  }
+});
+document.addEventListener("fullscreenchange", () => {
+  fullscreenButton.textContent = document.fullscreenElement ? "✕ Exit Fullscreen" : "⛶ Fullscreen";
+});
+updateClock();
+setInterval(updateClock, 1000);
+</script>
+</body>
+</html>
